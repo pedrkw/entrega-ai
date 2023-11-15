@@ -71,7 +71,7 @@ class ServiceController
     {
         $characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $randomString = '';
-        $deliveryDAO = new DeliveryDAO(); // Certifique-se de ajustar para o nome real da sua classe
+        $deliveryDAO = new DeliveryDAO();
 
         while (true) {
             $randomString = '';

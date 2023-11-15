@@ -14,39 +14,30 @@
                <div class="module-inner">
                   <?php include_once __DIR__ . '/../includes/sideMenu.php'; ?>
                   <div class="content-panel">
-                     <h2 class="title">Meus dados</h2>
+                     <h2 class="title">Mudar senha</h2>
                      <div class="mb-4 mt-4">
                         <?= SessionMessage(); ?>
                      </div>
                      <div class="billing">
-                        <form action="<?= BASE_URL ?>usuario/update" method="post" id="user-form-edit">
+                        <form action="<?= BASE_URL ?>usuario/senha/update" method="post">
                            <div class="form-group">
-                              <label class="control-label" for="name">Nome completo:</label>
-                              <input type="text" class="styles__Field-tg3uj4-1 gXNzQk" name="name" id="name" placeholder="Seu nome" value="<?= $_SESSION['user_name'] ?>" required>
+                              <label class="control-label" for="oldPassword">Senha atual:</label>
+                              <input type="password" class="styles__Field-tg3uj4-1 gXNzQk" name="oldPassword" id="oldPassword" placeholder="Senha atual" required>
                            </div>
                            <div class="form-group row">
                               <div class="col-sm-6 mb-3 mb-sm-0">
-                                 <label class="control-label" for="phone">Telefone:</label>
-                                 <input type="text" class="styles__Field-tg3uj4-1 gXNzQk" onkeydown="javascript: fMasc(this, mTel);" maxlength="12" name="phone" id="phone" placeholder="Telefone (XX) XXXXX-XXXX" value="<?= $_SESSION['user_phone'] ?>" required >
+                                 <label class="control-label" for="password">Nova senha:</label>
+                                 <input type="password" class="styles__Field-tg3uj4-1 gXNzQk" name="password" id="password" placeholder="Nova senha" required >
                               </div>
                               <div class="col-sm-6">
-                                 <label class="control-label" for="birthdate">Data de nascimento:</label>
-                                 <input type="date" max="9999-12-31" class="styles__Field-tg3uj4-1 gXNzQk" name="birthdate" id="birthdate" placeholder="Data de nascimento" value="<?= $_SESSION['user_birthdate'] ?>" required>
+                                 <label class="control-label" for="repeatPassword">Repita a nova senha:</label>
+                                 <input type="password" class="styles__Field-tg3uj4-1 gXNzQk" name="repeatPassword" id="repeatPassword" placeholder="Repita a senha" required>
                               </div>
-                           </div>
-                           <div class="form-group">
-                              <label class="control-label" for="email">Email:</label>
-                              <input type="email" class="styles__Field-tg3uj4-1 gXNzQk" name="email" id="email" placeholder="Seu email" value="<?= $_SESSION['user_email'] ?>" disabled required>
                            </div>
                            <input type="hidden" name="user_id" name="user_id" value="<?= $_SESSION['user_id'] ?>">
                            <button type="submit" class="btn site-btn"><i class="fa fa-save"></i>  Atualizar</button>
                         </form>
                      </div>
-
-                     <form class="user" action="<?= BASE_URL ?>usuario/delete" method="post" onsubmit="return confirm('Você deseja realmente excluir sua conta?');">
-                        <input type="hidden" name="user_id" name="user_id" value="<?= $_SESSION['user_id'] ?>">
-                        <button type="submit" class="btn btn-danger btn-user"><i class="fa fa-trash"></i> Apagar minha conta</button>
-                     </form>
                   </div>
                </div>
             </section>

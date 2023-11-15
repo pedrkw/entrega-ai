@@ -102,6 +102,30 @@ class UserController
         
     }
 
+    public function renderUpdatePassword()
+    {
+        // Verificar se o usuário já está autenticado
+        if (!isset($_SESSION['user_id'])) 
+        {
+            Helpers::redirect('usuario/login');
+        }
+
+        // Verificar se o motorista já está autenticado
+        if (isset($_SESSION['driver_id'])) 
+        {
+            Helpers::redirect('motorista/dashboard');
+        }
+
+        $title = "Mudar senha | Entrega aí";
+        $data = [
+            'title' => $title,
+            'menuDinamic' => '/mudar-senha'
+        ];
+
+        View::render('users/change-password', $data, 'default');
+        
+    }
+
     // Cadastro do usuário
     public function signupUser()
     {   
@@ -259,6 +283,58 @@ class UserController
         header('Content-Type: application/json');
         echo json_encode($response);
     }
+
+    // Atualizar senha
+    public function updatePassword()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            Helpers::redirect('usuario/mudar-senha');
+        }
+
+        $requiredFields = ['oldPassword', 'password', 'repeatPassword'];
+
+        if (!Helpers::checkEmptyFields($requiredFields)) {
+            $_SESSION['msg'] = Message::error("Preencha todos os campos!");
+            Helpers::redirect('usuario/mudar-senha');
+        }
+
+        if ($_POST['password'] != $_POST['repeatPassword']) {
+            $_SESSION['msg'] = Message::error("Senhas não são iguais!");
+            Helpers::redirect('usuario/mudar-senha');
+        }
+
+        $user_id = $_SESSION['user_id'];
+        $userDAO = new UserDAO();
+        $users = $userDAO->getByConditions("id = $user_id");
+
+        $oldPasswordForm = $_POST['oldPassword'];
+
+        foreach ($users as $user) {
+            // Verifica se a senha antiga fornecida pelo usuário corresponde à senha no banco de dados
+            if (!password_verify($oldPasswordForm, $user->getPassword())) {
+                $_SESSION['msg'] = Message::error("Senha antiga incorreta!");
+                Helpers::redirect('usuario/mudar-senha');
+            }
+
+            // Define a nova senha
+            $user->setPassword(Helpers::getHashPassword($_POST['password']));
+
+            $data = $user->toArrayGet();
+
+            // Tenta atualizar a senha no banco de dados
+            $updatePassword = $userDAO->update($data, $user_id);
+
+            if ($updatePassword) {
+                $_SESSION['msg'] = Message::success("Senha atualizada com sucesso!");
+                Helpers::redirect('usuario/dashboard');
+            } else {
+                $_SESSION['msg'] = Message::error("Erro ao atualizar a senha. Tente novamente!");
+                Helpers::redirect('usuario/mudar-senha');
+            }
+        }
+
+    }
+
 
     // Deletar o usuário
     public function deleteUser()

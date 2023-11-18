@@ -180,6 +180,7 @@ class UserController
             $_SESSION['user_name'] = $user->getName();
             $_SESSION['user_email'] = $user->getEmail();
             $_SESSION['user_phone'] = $user->getPhone();
+            $_SESSION['user_cpf'] = $user->getCpf();
             $_SESSION['user_birthdate'] = $user->getBirthdate();
             $_SESSION['first_name'] = Helpers::getFirstName($_SESSION['user_name']);
 
@@ -215,6 +216,7 @@ class UserController
             $_SESSION['user_name'] = $userData->getName();
             $_SESSION['user_email'] = $userData->getEmail();
             $_SESSION['user_phone'] = $userData->getPhone();
+            $_SESSION['user_cpf'] = $userData->getCpf();
             $_SESSION['user_birthdate'] = $userData->getBirthdate();
             $_SESSION['first_name'] = Helpers::getFirstName($_SESSION['user_name']);
 
@@ -242,6 +244,14 @@ class UserController
             Helpers::redirect('usuario/meus-dados');
         }
 
+        // Verifica se o CPF informado é válido
+        $cleanedCPF = preg_replace('/[^0-9]/', '', $_POST['cpf']);
+
+        if (!Helpers::checkCPF($cleanedCPF)) {
+            $_SESSION['msg'] = Message::error("CPF inválido.");
+            Helpers::redirect('usuario/meus-dados');
+        }
+
         // Limpeza e validação dos dados
         $name = $_POST['name'];
         $phone = preg_replace('/[^0-9]/', '', $_POST['phone']);
@@ -250,6 +260,7 @@ class UserController
         $user = new User();
         $user->setName($name);
         $user->setPhone($phone);
+        $user->setCpf($cleanedCPF);
         $user->setBirthdate($birthdate);
 
         $userDAO = new UserDAO();
@@ -267,6 +278,7 @@ class UserController
             $_SESSION['user_name'] = $updatedUser->getName();
             $_SESSION['user_email'] = $updatedUser->getEmail();
             $_SESSION['user_phone'] = $updatedUser->getPhone();
+            $_SESSION['user_cpf'] = $user->getCpf();
             $_SESSION['user_birthdate'] = $updatedUser->getBirthdate();
             $_SESSION['first_name'] = Helpers::getFirstName($_SESSION['user_name']);
 

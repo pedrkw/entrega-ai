@@ -15,6 +15,7 @@ use App\Functions\Dispatcher;
 use App\Controllers\HomeController;
 use App\Controllers\UserController;
 use App\Controllers\ServiceController;
+use App\Controllers\DeliveryController;
 use App\Controllers\AddressController;
 use App\Controllers\DriverController;
 use App\Controllers\ErrorController;
@@ -51,7 +52,10 @@ foreach ($userRoutesGroup as $userRoute) {
     
     // Rotas de serviço
     $dispatcher->addRoute($userRoute . '/servicos', ServiceController::class, 'renderService');
-    $dispatcher->addRoute($userRoute . '/historico', ServiceController::class, 'renderHistoric');
+    $dispatcher->addRoute($userRoute . '/delivery/new', DeliveryController::class, 'newDelivery');
+    $dispatcher->addRoute($userRoute . '/historico', DeliveryController::class, 'renderHistoric');
+    $dispatcher->addRoute($userRoute . '/rastrear', DeliveryController::class, 'trackingDelivery');
+    $dispatcher->addRoute($userRoute . '/rastrear/delivery/{deliveryId}', DeliveryController::class, 'trackingDeliveryId');
     
     // Rotas de endereço
     $dispatcher->addRoute($userRoute . '/enderecos', AddressController::class, 'renderAdresses');

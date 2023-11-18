@@ -25,6 +25,13 @@ class Address
             'addressDetails' => $this->getAddressDetails(),
             'number' => $this->getNumber(),
         ];
+
+        // Filtra os campos que não estão vazios
+        $filteredData = array_filter($data, function ($value) {
+            return $value !== '' && $value !== null;
+        });
+
+        return $filteredData;
     }
 
     // Métodos getters e setters para cada propriedade

@@ -11,6 +11,9 @@
                               <div class="d-sm-flex align-items-center justify-content-between">
                                  <h1 class="h3 mb-4 text-gray-800"><i class="fa fa-list-ul"></i> Histórico</h1>
                               </div>    
+                              <div class="mb-4 mt-4">
+                                 <?= SessionMessage(); ?>
+                              </div>
                               <div class="text-center">
                                  <?php 
                                  if(empty($deliveries)){ ?>
@@ -27,96 +30,114 @@
                                  foreach($deliveries as $delivery){ ?>
 
                                     <div class="delivery-area col-md-12">
-                                       <a href="#" data-toggle="modal" data-target="#<?= $delivery->getDelivery_id() ?>" class="text-decoration-none text-dark">
-                                          <div class="space-area shadow-sm">
-                                             <div class="d-flex align-items-center mb-3">
-                                                
-                                                <p class="btn-warning py-1 px-2 mb-0 text-center">
-                                                   <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>  Pendente  
-                                                </p>
-                                                
-                                                <p class="text-muted ml-auto mb-0"><i class="far fa-clock" aria-hidden="true"></i> <?= date('d/m/Y, H:i', strtotime($delivery->getCreated_at())); ?></p>
-                                             </div>
-                                             <div class="d-flex">
-                                                <p class="text-muted">Id do Pedido<br><span class=""><?= $delivery->getDelivery_id(); ?></span></p>
-                                                
-                                                <p class="text-muted ml-auto">Total do pedido<br><span class="font-weight-bold">R$ <?= number_format($delivery->getTotal_price(), 2, '.', ','); ?></span></p>
-                                             </div>
-                                          </div>
-                                       </a>
+                                        <a href="#" data-toggle="modal" data-target="#<?= $delivery->getDelivery_id() ?>" class="text-decoration-none text-dark">
+                                            <div class="space-area shadow-sm p-3">
+                                                <div class="row justify-content-center">
+                                                    <div class="col-md-6 col-lg-3 mb-3 mb-lg-0 text-center">
+                                                        <p class="btn <?= $delivery->getDelivery_Css_Class(); ?> py-1 px-2 mb-0 text-white">
+                                                            <i class="<?= $delivery->getDelivery_Icon(); ?>" aria-hidden="true"></i> <?= $delivery->getDelivery_Status_Name(); ?>
+                                                        </p>
+                                                    </div>
+                                                    <div class="col-md-6 col-lg-3 mb-3 mb-lg-0 text-center text-muted">
+                                                        <p class="mb-0">Solicitado em:</p>
+                                                        <p class="mb-0"><i class="far fa-clock" aria-hidden="true"></i> <?= date('d/m/Y, H:i', strtotime($delivery->getCreated_at())); ?></p>
+                                                    </div>
+                                                    <div class="col-md-6 col-lg-3 mb-3 mb-lg-0 text-center text-muted">
+                                                        <p class="mb-0">Id do Pedido</p>
+                                                        <p class="mb-0">
+                                                            <span class="font-weight-bold"><?= $delivery->getDelivery_id(); ?></span>
+                                                        </p>
+                                                    </div>
+                                                    <div class="col-md-6 col-lg-3 text-center text-muted">
+                                                        <p class="mb-0">Total do pedido</p>
+                                                        <p class="mb-0">
+                                                            <span class="font-weight-bold">R$ <?= number_format($delivery->getTotal_price(), 2, '.', ','); ?></span>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </a>
                                     </div>
 
+
+
                                     <div class="modal fade" id="<?= $delivery->getDelivery_id(); ?>" tabindex="-1" role="dialog" aria-hidden="true">
-                                     <div class="modal-dialog" role="document">
-                                         <div class="modal-content">
-                                             <div class="modal-header">
-                                                 <h5 class="modal-title"><i class="fa fa-check-circle" aria-hidden="true"></i> Entrega #<?= $delivery->getDelivery_id(); ?></h5>
-                                                 <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                                                     <span aria-hidden="true">×</span>
-                                                 </button>
-                                             </div>
-                                             <div class="modal-body table-responsive">
-                                                 <div id="container-fields">
-                                                     <div class="row">
-                                                         <div class="col-lg-12 col-md-12 col-sm-12">
-                                                             <div class="osahan-status">
-                                                                 <!-- Data da entrega -->
-                                                                 <div class="space-area status-order border-bottom d-flex align-items-center">
-                                                                     <p class="m-0"><i class="far fa-clock"></i> <?= date('d/m/Y, H:i', strtotime($delivery->getCreated_at())); ?></p>
-                                                                 </div>
-
-                                                                 <!-- Status do Pedido -->
-                                                                 <div class="space-area border-bottom">
-                                                                     <h6 class="font-weight-bold">Status do Pedido:</h6>
-                                                                     <div class="tracking-wrap">
-                                                                         <div class="my-1 step"><span class="text"></span></div>
-                                                                     </div>
-                                                                 </div>
-
-                                                                 <!-- Observações -->
-                                                                 <div class="space-area border-bottom">
-                                                                     <h6 class="font-weight-bold">Suas observações:</h6>
-                                                                     <p class="m-0"><?= ($delivery->getDelivery_details() == '' ? "Não há observações." : $delivery->getDelivery_details()) ?></p>
-                                                                 </div>
-
-                                                                 <!-- Local de entrega -->
-                                                                 <div class="space-area border-bottom">
-                                                                     <h6 class="font-weight-bold">Local de entrega:</h6>
-                                                                     <p class="m-0 text-muted">Retirar no local</p>
-                                                                 </div>
-
-                                                                 <!-- Forma de pagamento -->
-                                                                 <div class="space-area border-bottom">
-                                                                     <h6 class="font-weight-bold">Forma de pagamento:</h6>
-                                                                     <p class="m-0"><!-- Adicione a forma de pagamento aqui --></p>
-                                                                 </div>
-
-                                                                 <!-- Data de entrega -->
-                                                                 <div class="space-area border-bottom">
-                                                                     <h6 class="font-weight-bold"><i class="fa fa-truck" aria-hidden="true"></i> Entregue em:</h6>
-                                                                     <p class="text-muted m-0"><?= date('d/m/Y, H:i', strtotime($delivery->getCreated_at())); ?></p>
-                                                                 </div>
-
-                                                                 <!-- Total -->
-                                                                 <div class="space-area">
-                                                                     <div class="d-flex align-items-center mb-2">
-                                                                         <h6 class="font-weight-bold mb-1">Total:</h6>
-                                                                         <h6 class="font-weight-bold ml-auto mb-1">R$ <?= number_format($delivery->getTotal_price(), 2, ',', '.'); ?></h6>
-                                                                     </div>
-                                                                     <p class="m-0 text-muted text-center">Obrigado por usar. Te esperamos de novo! <i class="fa fa-laugh-wink"></i></p>
-                                                                 </div>
-                                                             </div>
-                                                         </div>
-                                                     </div>
-                                                 </div>
-                                             </div>
-                                             <div class="modal-footer" id="hidden-print">
-                                                 <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-times"></i> Fechar</button>
-                                                 <button type="submit" class="btn btn-primary" target="_blank" onclick="window.print()"><i class="fa fa-print"></i> Imprimir comprovante</button>
-                                             </div>
-                                         </div>
-                                     </div>
-                                 </div>
+                                        <div class="modal-dialog modal-lg" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header bg-primary text-white">
+                                                    <h5 class="modal-title"><i class="fa fa-check-circle" aria-hidden="true"></i> Detalhes da Entrega #<?= $delivery->getDelivery_id(); ?></h5>
+                                                    <button class="close text-white" type="button" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">×</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="container-fluid">
+                                                        <div class="row">
+                                                            <div class="col-md-12 mb-4">
+                                                                <p class="text-muted"><i class="far fa-clock"></i> Data da entrega: <?= date('d/m/Y, H:i', strtotime($delivery->getCreated_at())); ?></p>
+                                                            </div>
+                                                            <div class="col-md-12 mb-4">
+                                                                <h5>Status do Pedido</h5>
+                                                                <p class="btn <?= $delivery->getDelivery_Css_Class(); ?> py-1 px-2 mb-0 text-white">
+                                                                    <i class="<?= $delivery->getDelivery_Icon(); ?>" aria-hidden="true"></i> <?= $delivery->getDelivery_Status_Name(); ?>
+                                                                </p>
+                                                                <p class="text-muted mb-0"><?= $delivery->getDelivery_Status_Description(); ?></p>
+                                                            </div>
+                                                            <div class="col-md-12 mb-4">
+                                                                <div id="map" style="width: 100%; height: 250px;"></div>
+                                                            </div>
+                                                            <div class="col-md-12 mb-4">
+                                                                <h5>Suas Observações</h5>
+                                                                <p class="text-muted"><?= ($delivery->getDelivery_details() == '') ? "Não há observações." : $delivery->getDelivery_details(); ?></p>
+                                                            </div>
+                                                            <div class="col-md-6 mb-4">
+                                                                <h5>Local de Retirada</h5>
+                                                                <p class="text-muted"><?= $delivery->getSender_address_details() . ", N " . $delivery->getSender_house_number(); ?></p>
+                                                            </div>
+                                                            <div class="col-md-6 mb-3">
+                                                                <h5>Local de Entrega</h5>
+                                                                <p class="text-muted"><?= $delivery->getRecipient_address_details() . ", N " . $delivery->getRecipient_house_number(); ?></p>
+                                                            </div>
+                                                            <div class="col-md-6 mb-3">
+                                                                <h5>Tipo de Veículo</h5>
+                                                                <p class="text-muted"><?= $delivery->getVehicle_type_name() . " | R$ " . number_format($delivery->getVehicle_base_rate(), 2, ',', '.') . " | R$ " . number_format($delivery->getVehicle_rate_per_km(), 2, ',', '.') . " / Km"; ?></p>
+                                                            </div>
+                                                            <div class="col-md-6 mb-3">
+                                                                <h5>Peso Total</h5>
+                                                                <p class="text-muted"><?= $delivery->getWeight(); ?> Kg</p>
+                                                            </div>
+                                                            <div class="col-md-6 mb-3">
+                                                                <h5>Distância</h5>
+                                                                <p class="text-muted"><?= $delivery->getTotal_km(); ?> Km</p>
+                                                            </div>
+                                                            <div class="col-md-6 mb-3">
+                                                                <h5>Forma de Pagamento</h5>
+                                                                <p class="text-muted">Cartão de Crédito</p>
+                                                            </div>
+                                                            <div class="col-md-6 mb-3">
+                                                                <h5>Nome do Motorista</h5>
+                                                                <p class="text-muted"><?= (empty($delivery->getDriver_name())) ? "Nenhum motorista aceitou seu pedido" : $delivery->getDriver_name(); ?></p>
+                                                            </div>
+                                                            <?php if ($delivery->getDelivery_status_id() === 5) { ?>
+                                                                <div class="col-md-6 mb-3">
+                                                                    <h5><i class="fa fa-truck" aria-hidden="true"></i> Entregue em:</h5>
+                                                                    <p class="text-muted"><?= date('d/m/Y, H:i', strtotime($delivery->getUpdated_at())); ?></p>
+                                                                </div>
+                                                            <?php } ?>
+                                                            <div class="col-md-12">
+                                                                <h4 class="text-center mb-4">Total: R$ <?= number_format($delivery->getTotal_price(), 2, ',', '.'); ?></h4>
+                                                                <p class="text-muted text-center">Obrigado por escolher nossos serviços! Esperamos vê-lo novamente em breve! <i class="fa fa-laugh-wink"></i></p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer text-center">
+                                                    <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-times"></i> Fechar</button>
+                                                    <a href="<?= BASE_URL ?>usuario/rastrear/delivery/<?= $delivery->getDelivery_id(); ?>" class="btn btn-primary" target="_blank"><i class="fa fa-print"></i> Veja onde está sua encomenda!</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
 
                                  <?php }} ?>
      
@@ -129,5 +150,29 @@
             </div>
          </div>
       </div>
+
+
+<script type="text/javascript">
+    var map;
+    var directionsService;
+    var directionsRenderer;
+
+    function initMap() {
+        // Inicializa o serviço de direções e o renderizador de direções do Google Maps.
+        directionsService = new google.maps.DirectionsService();
+        directionsRenderer = new google.maps.DirectionsRenderer();
+
+        // Cria um mapa e o exibe na página.
+        map = new google.maps.Map(document.getElementById('map'), {
+            center: {
+                lat: -4.9690932199055835,
+                lng: -39.016540651386585
+            },
+            zoom: 15,
+            mapTypeId: 'roadmap'
+        });
+    }
+</script>
+
 
 <?php include_once __DIR__ . '/../includes/footer.php'; ?>

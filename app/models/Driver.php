@@ -8,10 +8,10 @@ class Driver
     private string $name;
     private string $email;
     private string $password;
-    private string $phone;
-    private string $cpf;
-    private string $licence;
-    private string $birthdate;
+    private int $phone;
+    private int $cpf;
+    private int $licence;
+    private int $birthdate;
     private ?string $validated = null;
     private int $type_user;
     private ?string $created_at = null;

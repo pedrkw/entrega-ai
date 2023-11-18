@@ -34,6 +34,12 @@
                                  <input type="date" max="9999-12-31" class="styles__Field-tg3uj4-1 gXNzQk" name="birthdate" id="birthdate" placeholder="Data de nascimento" value="<?= $_SESSION['user_birthdate'] ?>" required>
                               </div>
                            </div>
+                           <div class="form-group row">
+                              <div class="col-sm-6 mb-3 mb-sm-0">
+                                 <label class="control-label" for="cpf">Cpf:</label>
+                                 <input type="text" class="styles__Field-tg3uj4-1 gXNzQk" onkeydown="javascript: fMasc(this, mCPF);" maxlength="14" name="cpf" id="cpf" placeholder="Telefone (XX) XXXXX-XXXX" value="<?= $_SESSION['user_cpf'] ?>" required >
+                              </div>
+                           </div>
                            <div class="form-group">
                               <label class="control-label" for="email">Email:</label>
                               <input type="email" class="styles__Field-tg3uj4-1 gXNzQk" name="email" id="email" placeholder="Seu email" value="<?= $_SESSION['user_email'] ?>" disabled required>

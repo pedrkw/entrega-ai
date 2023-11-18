@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 15/11/2023 às 13:56
+-- Tempo de geração: 18/11/2023 às 01:06
 -- Versão do servidor: 10.4.20-MariaDB
 -- Versão do PHP: 8.0.9
 
@@ -50,23 +50,65 @@ CREATE TABLE `deliveries` (
   `delivery_id` varchar(17) NOT NULL,
   `user_id` int(11) DEFAULT NULL,
   `driver_id` int(11) DEFAULT NULL,
-  `sender_name` varchar(255) NOT NULL,
   `sender_latitude` varchar(100) NOT NULL,
   `sender_longitude` varchar(100) NOT NULL,
+  `sender_address_details` varchar(255) NOT NULL,
   `sender_house_number` int(10) NOT NULL,
   `recipient_name` varchar(255) NOT NULL,
   `recipient_latitude` varchar(100) NOT NULL,
   `recipient_longitude` varchar(100) NOT NULL,
+  `recipient_address_details` varchar(255) NOT NULL,
   `recipient_house_number` varchar(20) NOT NULL,
   `vehicle_type_id` int(11) NOT NULL,
-  `total_km` float NOT NULL,
+  `vehicle_id` int(11) NOT NULL,
+  `weight` varchar(10) NOT NULL,
+  `total_km` varchar(255) NOT NULL,
   `total_price` decimal(10,2) NOT NULL,
   `delivery_status_id` int(11) NOT NULL DEFAULT 1,
   `delivery_details` text DEFAULT NULL,
   `delivery_date` datetime DEFAULT NULL,
+  `current_latitude` varchar(255) NOT NULL,
+  `current_longitude` varchar(255) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Despejando dados para a tabela `deliveries`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `delivery_status`
+--
+
+CREATE TABLE `delivery_status` (
+  `id` int(11) NOT NULL,
+  `status_name` varchar(100) NOT NULL,
+  `status_description` text DEFAULT NULL,
+  `icon` varchar(255) NOT NULL,
+  `css_class` varchar(50) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Despejando dados para a tabela `delivery_status`
+--
+
+INSERT INTO `delivery_status` (`id`, `status_name`, `status_description`, `icon`, `css_class`, `created_at`, `updated_at`) VALUES
+(1, 'Pedido Recebido', 'Eba! Recebemos seu pedido! Estamos conectando você a um motorista parceiro que logo estará a caminho.', '', 'bg-warning', '2023-11-16 22:56:23', '2023-11-16 23:02:35'),
+(2, 'Motorista Confirmado', 'Excelente! Um motorista parceiro já aceitou seu pedido. Ele está se preparando para buscar ou entregar seu item!', '', 'bg-info', '2023-11-16 22:56:23', '2023-11-16 23:07:27'),
+(3, 'A Caminho', 'Seu motorista está a caminho para buscar ou entregar seu item. Logo logo ele chega, tudo pronto para você!', '', 'bg-info', '2023-11-16 22:56:23', '2023-11-16 23:07:10'),
+(4, 'Entrega Concluída', 'Sucesso! Seu pedido foi entregue com carinho pelo nosso motorista parceiro. Obrigado por contar com a gente!', '', 'bg-success', '2023-11-16 22:56:23', '2023-11-16 23:07:03'),
+(5, 'Aguardando Motorista', 'Estamos buscando um motorista parceiro disponível para atender ao seu pedido.', 'path/to/icon/waiting.png', 'waiting', '2023-11-16 17:00:00', '2023-11-16 17:00:00'),
+(6, 'Cancelado pelo Motorista', 'O motorista parceiro cancelou o pedido de entrega.', 'path/to/icon/canceled.png', 'canceled', '2023-11-16 17:00:00', '2023-11-16 17:00:00'),
+(7, 'Problemas de Entrega', 'Houve um problema durante a entrega. Estamos resolvendo para garantir a melhor experiência.', 'path/to/icon/problem.png', 'problem', '2023-11-16 17:00:00', '2023-11-16 17:00:00'),
+(8, 'Entrega Adiada', 'Sua entrega foi adiada para um novo horário. Desculpe pelo inconveniente!', 'path/to/icon/delayed.png', 'delayed', '2023-11-16 17:00:00', '2023-11-16 17:00:00'),
+(9, 'Em Rota Alternativa', 'O motorista está seguindo por uma rota alternativa para garantir a entrega o mais rápido possível.', 'path/to/icon/alternate_route.png', 'alternate-route', '2023-11-16 17:00:00', '2023-11-16 17:00:00'),
+(10, 'Aguardando Confirmação', 'Hum... ainda estamos aguardando confirmação do pagamento para prosseguir com a entrega.', 'path/to/icon/awaiting_confirmation.png', 'awaiting-confirmation', '2023-11-16 17:00:00', '2023-11-16 23:14:31'),
+(11, 'Entrega Devolvida', 'Sua entrega foi devolvida ao remetente.', 'path/to/icon/returned.png', 'returned', '2023-11-16 17:00:00', '2023-11-16 17:00:00');
 
 -- --------------------------------------------------------
 
@@ -102,10 +144,34 @@ CREATE TABLE `users` (
   `password` varchar(250) NOT NULL,
   `phone` varchar(12) NOT NULL,
   `birthdate` varchar(10) NOT NULL,
+  `cpf` int(11) NOT NULL,
   `validated` int(11) NOT NULL,
   `type_user` int(1) NOT NULL DEFAULT 2,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `update_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Despejando dados para a tabela `users`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `vehicles`
+--
+
+CREATE TABLE `vehicles` (
+  `id` int(11) NOT NULL,
+  `vehicle_type_id` int(11) NOT NULL,
+  `driver_id` int(11) NOT NULL,
+  `plate_number` varchar(20) NOT NULL,
+  `brand` varchar(100) NOT NULL,
+  `color` varchar(50) NOT NULL,
+  `manufacture_year` int(4) NOT NULL,
+  `details` varchar(100) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -152,6 +218,12 @@ ALTER TABLE `deliveries`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Índices de tabela `delivery_status`
+--
+ALTER TABLE `delivery_status`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Índices de tabela `drivers`
 --
 ALTER TABLE `drivers`
@@ -161,6 +233,12 @@ ALTER TABLE `drivers`
 -- Índices de tabela `users`
 --
 ALTER TABLE `users`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Índices de tabela `vehicles`
+--
+ALTER TABLE `vehicles`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -177,25 +255,25 @@ ALTER TABLE `vehicle_types`
 -- AUTO_INCREMENT de tabela `adresses`
 --
 ALTER TABLE `adresses`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT de tabela `deliveries`
 --
 ALTER TABLE `deliveries`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT de tabela `drivers`
 --
 ALTER TABLE `drivers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT de tabela `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
 
 --
 -- AUTO_INCREMENT de tabela `vehicle_types`

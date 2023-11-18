@@ -9,7 +9,7 @@ class User
     private ?string $name = null;
     private ?string $email = null;
     private string $phone;
-    private ?string $cpf = null;
+    private ?int $cpf = null;
     private ?string $password = null;
     private string $birthdate;
     private ?string $validated = null;

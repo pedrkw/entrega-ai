@@ -32,7 +32,7 @@
                                                                   <i class="fa fa-map-marker" aria-hidden="true"></i> <?= $address->getAddressDetails() . ", " . $address->getNumber(); ?>
                                                               </p>
                                                               <p class="text-muted ml-auto mb-0">
-                                                                  <form action="<?= BASE_URL ?>usuario/enderecos/delete" method="post" onsubmit="confirm('Você tem certeza que quer apagar esse endereço?')">
+                                                                  <form action="<?= BASE_URL ?>usuario/enderecos/delete" method="post" onsubmit="return confirm('Você tem certeza que quer apagar esse endereço?')">
                                                                       <input type="hidden" name="id" id="id" value="<?= $address->getId(); ?>">
                                                                       <button type="submit" class="site-btn-danger site-btn">
                                                                           <i class="fa fa-trash" aria-hidden="true"></i>
@@ -83,10 +83,7 @@
                            <input type="text" class="form-control form-control-user" name="description" id="description" placeholder="Ex: Meu trabalho; Minha casa, etc..." required>
                         </div>
                         <div class="modal-footer modal-footer-address">
-                           <button class="site-btn-danger" onclick="clearMap()">
-                              <i class="fa fa-times" aria-hidden="true"></i> Limpar Mapa
-                           </button>
-                           <button type="submit" class="site-btn">
+                            <button type="submit" class="site-btn">
                               <i class="fa fa-save" aria-hidden="true"></i> Cadastrar
                            </button>
                         </div>
@@ -171,8 +168,6 @@
              });
          }
 
-
-
           function getUserLocation() {
               // Obtém a localização do usuário usando a geolocalização do navegador.
               if (navigator.geolocation) {
@@ -206,18 +201,6 @@
               } else {
                   alert("Seu navegador não suporta geolocalização.");
               }
-          }
-
-          function clearMap() {
-              // Remove os marcadores existentes (se houverem)
-              if (userMarker) {
-                  userMarker.setMap(null);
-              }
-
-              originLatLng = null;
-              document.getElementById('origin').textContent = 'Clique no mapa para definir';
-              document.getElementById('latitude').value = '';
-              document.getElementById('longitude').value = '';
           }
 
       </script>

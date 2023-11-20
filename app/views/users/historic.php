@@ -131,9 +131,13 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="modal-footer text-center">
-                                                    <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-times"></i> Fechar</button>
-                                                    <a href="<?= BASE_URL ?>usuario/rastrear/delivery/<?= $delivery->getDelivery_id(); ?>" class="btn btn-primary" target="_blank"><i class="fa fa-print"></i> Veja onde está sua encomenda!</a>
+                                                <div class="modal-footer text-center justify-content-center">
+                                                    <button type="button" class="btn btn-danger" data-dismiss="modal">
+                                                        <i class="fa fa-times"></i> Fechar
+                                                    </button>
+                                                    <a href="<?= BASE_URL ?>usuario/rastrear/delivery/<?= $delivery->getDelivery_id(); ?>" class="btn btn-primary" target="_blank">
+                                                        <i class="fa fa-search"></i> Rastrear Encomenda
+                                                    </a>
                                                 </div>
                                             </div>
                                         </div>
@@ -152,27 +156,25 @@
       </div>
 
 
-<script type="text/javascript">
-    var map;
-    var directionsService;
-    var directionsRenderer;
+    <script type="text/javascript">
+        var map;
+        var directionsService;
+        var directionsRenderer;
 
-    function initMap() {
-        // Inicializa o serviço de direções e o renderizador de direções do Google Maps.
-        directionsService = new google.maps.DirectionsService();
-        directionsRenderer = new google.maps.DirectionsRenderer();
+        function initMap() {
 
-        // Cria um mapa e o exibe na página.
-        map = new google.maps.Map(document.getElementById('map'), {
-            center: {
-                lat: -4.9690932199055835,
-                lng: -39.016540651386585
-            },
-            zoom: 15,
-            mapTypeId: 'roadmap'
-        });
-    }
-</script>
+            directionsService = new google.maps.DirectionsService();
+            directionsRenderer = new google.maps.DirectionsRenderer();
 
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: {
+                    lat: -4.9690932199055835,
+                    lng: -39.016540651386585
+                },
+                zoom: 15,
+                mapTypeId: 'roadmap'
+            });
+        }
+    </script>
 
 <?php include_once __DIR__ . '/../includes/footer.php'; ?>

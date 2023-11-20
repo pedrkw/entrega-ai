@@ -87,6 +87,10 @@ class DeliveryController
             Helpers::redirect('motorista/dashboard');
         }
 
+        if(!isset($delivery_id)){
+            Helpers::redirect('usuario/historico');   
+        }
+
         $user_id = (int) $_SESSION['user_id'];
 
         $deliveryDAO = new DeliveryDAO();

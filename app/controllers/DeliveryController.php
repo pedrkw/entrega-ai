@@ -47,6 +47,62 @@ class DeliveryController
         View::render('users/historic', $data, 'default');
     }
 
+    public function renderAvailableDeliveries()
+    {
+        // Verificar se o usuário já está autenticado
+        if (isset($_SESSION['user_id'])) 
+        {
+            Helpers::redirect('usuario/dashboard');
+        }
+
+        $driver_id = (int) $_SESSION['driver_id'];
+
+        $deliveryDAO = new DeliveryDAO();
+
+        $availableDeliveries = $deliveryDAO->getAvailableDeliveries("delivery_status_id = 1 ORDER BY total_price DESC");
+
+        $title = "Meu histórico | Entrega aí";
+        $data = [
+            'title' => $title,
+            'availableDeliveries' => $availableDeliveries,
+            'menuDinamic' => '/historico'
+        ];
+
+        View::render('drivers/availableDeliveries', $data, 'default');
+    }
+
+    public function acceptDelivery()
+    {
+        
+        if (!isset($_SESSION['driver_id'])) {
+            Helpers::redirect('motorista/login');
+        }
+
+        $driver_id = (int) $_SESSION['driver_id'];
+
+        $delivery_id = isset($_POST['delivery_id']) ? $_POST['delivery_id'] : null;
+        
+        if ($delivery_id !== null) {
+         
+            $delivery = new Delivery();
+            $delivery->setDriver_id($driver_id);
+            $delivery->setDelivery_status_id(2);
+
+            $deliveryDAO = new DeliveryDAO();
+            $data = $delivery->toArrayGet();
+
+            // Atualizar a entrega
+            $updatedDelivery = $deliveryDAO->updateDelivery($data, $delivery_id);
+
+            if ($updatedDelivery) {
+                echo "Algo deu errado na atualização da entrega";
+            } else {
+                echo "Deu certo";
+            }
+        } else {
+            echo "ID da entrega não está definido ou é inválido";
+        }
+    }
 
     public function trackingDelivery()
     {

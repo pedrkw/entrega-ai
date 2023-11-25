@@ -48,6 +48,59 @@ class DeliveryDAO extends GenericDAO
         return $this->executeQuery($sql, $params);
     }
 
+    // Pegar o todos os pedidos disponíveis
+    public function getAvailableDeliveries()
+    { 
+        $sql = "
+        SELECT 
+        deliveries.*, users.*, 
+        users.name AS user_name, 
+        vehicle_types.id AS vehicle_type_id, 
+        vehicle_types.type_name AS vehicle_type_name, 
+        vehicle_types.base_rate AS vehicle_base_rate, 
+        vehicle_types.rate_per_km AS vehicle_rate_per_km,
+        drivers.name AS driver_name,
+        delivery_status.status_name AS delivery_status_name,
+        delivery_status.status_description AS delivery_status_description,
+        delivery_status.icon AS delivery_icon,
+        delivery_status.css_class AS delivery_css_class
+        FROM deliveries
+        JOIN vehicle_types ON deliveries.vehicle_type_id = vehicle_types.id
+        LEFT JOIN drivers ON deliveries.driver_id = drivers.id
+        LEFT JOIN users ON deliveries.user_id = users.id
+        LEFT JOIN delivery_status ON deliveries.delivery_status_id = delivery_status.id
+        WHERE deliveries.delivery_status_id = 1
+        ORDER BY deliveries.total_price DESC;
+        ";
+
+        return $this->executeQuery($sql);
+    }
+
+
+    // Atualiza registro
+    public function updateDelivery(array $data, $delivery_id)
+    {
+        // Obter os nomes válidos das colunas da tabela
+        $validColumns = $this->getTableColumns();
+
+        // Filtrar apenas as colunas válidas do array de dados
+        $filteredData = array_intersect_key($data, array_flip($validColumns));
+
+        // Verificar se há colunas válidas após a filtragem
+        if (empty($filteredData)) {
+            throw new \InvalidArgumentException("Nenhum nome de coluna válido fornecido.");
+        }
+
+        $params = array_merge($filteredData, ['delivery_id' => $delivery_id]);
+
+        $placeholders = implode(", ", array_map(fn($key) => "$key = :$key", array_keys($filteredData)));
+
+        $sql = "UPDATE deliveries SET $placeholders WHERE delivery_id = :delivery_id";
+
+        return $this->executeQuery($sql, $params);
+
+    }
+
     public function getTrackingDelivery($user_id, $delivery_id)
     {
         $sql = "

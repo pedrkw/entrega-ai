@@ -78,6 +78,10 @@ foreach ($driverRoutesGroup as $driverRoute) {
     $dispatcher->addRoute($driverRoute . '/logout', DriverController::class, 'logoutDriver');
     $dispatcher->addRoute($driverRoute . '/dashboard', DriverController::class, 'renderHome');
 
+    // Rotas de serviço
+    $dispatcher->addRoute($driverRoute . '/servicos', DeliveryController::class, 'renderAvailableDeliveries');
+    $dispatcher->addRoute($driverRoute . '/acceptDelivery', DeliveryController::class, 'acceptDelivery');
+
 }
 
 

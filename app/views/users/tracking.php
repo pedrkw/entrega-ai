@@ -9,7 +9,7 @@
                          <div class="p-3 mb-4 ">
 
                             <?php if(!isset($delivery_id)){ ?>
-
+                            
                             <div class="d-sm-flex align-items-center justify-content-between">
                                <h1 class="h3 mb-4 text-gray-800">Rastreie sua encomenda 😊</h1>
                                <a href="<?= BASE_URL ?>/usuario/historico" class="site-btn">Voltar</a>
@@ -31,7 +31,30 @@
 
                             <?php }else{ ?>
 
-                               <div class="container">
+                            <?php if(empty($delivery)){ ?>
+                                
+                            <div class="d-sm-flex align-items-center justify-content-between">
+                               <h1 class="h3 mb-4 text-gray-800">Que pena... 😥</h1>
+                            </div>
+                            
+                            <p class="h5 mb-4 text-gray-800">Não achei sua encomenda, mas vamos tentar de novo:</p>
+
+                            <div class="col-lg-12 text-center" style="margin: auto; margin-top: 20px;" id="collapseRastreio">
+                                  <div class="card-body">
+                                    <form class="user" action="<?= BASE_URL ?>usuario/rastrear" method="post" id="searchForm">
+                                       <div class="form-group">
+                                         <input type="text" class="form-control form-control-user" name="delivery_id" id="delivery_id" placeholder="Código de rastreio" value="<?= (isset($delivery_id) && !empty($delivery) ? $delivery_id : ""); ?>" 
+                                  aria-label="Search" aria-describedby="basic-addon2" required>
+                                
+                                       </div>
+                                       <button type="submit" class="btn btn-primary btn-user btn-block"><span><i class="fa fa-search"></i> Rastrear</span></button>
+                                    </form>
+                                  </div>
+                            </div>
+
+                            <?php }else{ ?>
+
+                                <div class="container">
                                     <div class="d-sm-flex align-items-center justify-content-between mt-4">
                                         <h1 class="h3 mb-0 text-gray-800">Encomenda #<?= $delivery_id; ?></h1>
                                         <a href="<?= BASE_URL ?>usuario/historico" class="btn btn-secondary">Voltar</a>
@@ -51,7 +74,7 @@
                                 </div>
 
 
-                            <?php } ?>
+                            <?php }} ?>
                          </div>
                       </div>
                    </div>

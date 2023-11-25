@@ -98,7 +98,7 @@ class Helpers
 	}
 
 	// Função que gera ID do delivery
-	public static function generateUniqueRandomString($length = 15)
+	public static function generateUniqueRandomString($length = 13)
         {
             $characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
             $randomString = '';
@@ -118,7 +118,7 @@ class Helpers
                 }
             }
 
-            return $randomString . "AI";
+            return "BR" .$randomString . "AI";
     }
 
 }

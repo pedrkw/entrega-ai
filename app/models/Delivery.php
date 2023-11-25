@@ -5,7 +5,7 @@ namespace App\Models;
 class Delivery
 {
     private ?int $id = null;
-    private string $delivery_id;
+    private ?string $delivery_id  = null;
     private ?int $user_id = null;
     private ?int $driver_id = null;
     private ?string $sender_name = null;
@@ -18,11 +18,11 @@ class Delivery
     private ?float $recipient_longitude = null;
     private ?string $recipient_address_details = null;
     private ?string $recipient_house_number = null;
-    private int $vehicle_type_id;
-    private string $weight;
+    private ?int $vehicle_type_id  = null;
+    private ?string $weight  = null;
     private ?int $delivery_status_id = null;
-    private string $total_km;
-    private string $total_price;
+    private ?string $total_km  = null;
+    private ?string $total_price  = null;
     private ?string $delivery_details = null;
     private ?string $delivery_date = null;
     private ?string $current_latitude = null;
@@ -37,6 +37,9 @@ class Delivery
 
     // Atributos da classe Driver
     private ?string $driver_name = null;
+
+    // Atributos da classe Users
+    private ?string $user_name = null;
 
     // Atributos da classe DeliveryStatus
     private ?string $delivery_status_name = null;
@@ -93,14 +96,12 @@ class Delivery
         $this->id = $id;
     }
 
-    public function getDelivery_id()
-    {
-        return $this->delivery_id;
+    public function setDelivery_id($delivery_id) {
+        $this->delivery_id = $delivery_id;
     }
 
-    public function setDelivery_id($delivery_id)
-    {
-        $this->delivery_id = $delivery_id;
+    public function getDelivery_id(){
+        return $this->delivery_id;
     }
 
     public function getUser_id()
@@ -371,6 +372,16 @@ class Delivery
     public function setDriver_name()
     {
         return $this->driver_name = $driver_name;
+    }
+
+    public function getUser_name()
+    {
+        return $this->user_name;
+    }
+
+    public function setUser_name()
+    {
+        return $this->user_name = $user_name;
     }
 
     public function getDelivery_Status_Name(): ?string {

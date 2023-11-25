@@ -12,8 +12,7 @@ class User
     private ?int $cpf = null;
     private ?string $password = null;
     private string $birthdate;
-    private ?string $validated = null;
-    private ?int $type_user = null;
+    private ?int $validated = null;
     private ?string $created_at = null;
     private ?string $updated_at = null;
 
@@ -117,14 +116,6 @@ class User
     public function setValidated($validated)
     {
         $this->validated = $validated;
-    }
-
-    public function getTypeUser(): int {
-        return $this->type_user;
-    }
-
-    public function setTypeUser(int $type_user): void {
-        $this->type_user = $type_user;
     }
     
     public function getCreated_at()

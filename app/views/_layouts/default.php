@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="<?= CSS ?>/bootstrap.min.css" type="text/css">
     <link rel="stylesheet" href="<?= CSS ?>/font-awesome.min.css" type="text/css">
     <link rel="stylesheet" href="<?= CSS ?>/elegant-icons.css" type="text/css">
-    <link rel="stylesheet" href="<?= CSS ?>/nice-select.css" type="text/css">
+    <!--<link rel="stylesheet" href="<?= CSS ?>/nice-select.css" type="text/css">-->
     <link rel="stylesheet" href="<?= CSS ?>/jquery-ui.min.css" type="text/css">
     <link rel="stylesheet" href="<?= CSS ?>/owl.carousel.min.css" type="text/css">
     <link rel="stylesheet" href="<?= CSS ?>/slicknav.min.css" type="text/css">
@@ -36,7 +36,7 @@
     <!-- Js Plugins -->
     <script src="<?= JS ?>/jquery-3.3.1.min.js"></script>
     <script src="<?= JS ?>/bootstrap.min.js"></script>
-    <script src="<?= JS ?>/jquery.nice-select.min.js"></script>
+    <!--<script src="<?= JS ?>/jquery.nice-select.min.js"></script>-->
     <script src="<?= JS ?>/jquery-ui.min.js"></script>
     <script src="<?= JS ?>/jquery.slicknav.js"></script>
     <script src="<?= JS ?>/owl.carousel.min.js"></script>

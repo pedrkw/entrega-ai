@@ -2,6 +2,8 @@
 
 namespace App\Controllers;
 
+use App\Models\Card;
+use App\Models\DAO\CardDAO;
 use App\Models\VehicleType;
 use App\Models\DAO\VehicleTypeDAO;
 use App\Functions\Database;
@@ -27,13 +29,19 @@ class ServiceController
             Helpers::redirect('motorista/dashboard');
         }
         
+        $user_id = $_SESSION['user_id'];
+
         $vehicleTypeDAO = new VehicleTypeDAO();
         $vehicleTypes = $vehicleTypeDAO->getAll();
+
+        $cardDAO = new CardDAO();
+        $cards = $cardDAO->getByConditions("user_id = $user_id");
 
         $title = "Solicite um serviço | Entrega aí";
         $data = [
             'title' => $title,
             'vehicleTypes' => $vehicleTypes,
+            'cards' => $cards,
             'menuDinamic' => '/servicos'
         ];
 

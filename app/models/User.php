@@ -17,26 +17,18 @@ class User
     private ?string $updated_at = null;
 
 
-    public function toArrayGet()
+    public static function fromArray(array $data): User
     {
-        $data = [
-            'name' => $this->getName(),
-            'email' => $this->getEmail(),
-            'phone' => $this->getPhone(),
-            'cpf' => $this->getCpf(),
-            'birthdate' => $this->getBirthdate(),
-            'password' => $this->getPassword(),
-        ];
-
-        // Filtra os campos que não estão vazios
-        $filteredData = array_filter($data, function ($value) {
-            return $value !== '' && $value !== null;
-        });
-
-        return $filteredData;
+        $user = new self();
+        foreach ($data as $key => $value) {
+            $method = 'set' . ucfirst($key);
+            if (method_exists($user, $method)) {
+                $user->$method($value);
+            }
+        }
+        return $user;
     }
 
-    
     // Métodos getters e setters para cada propriedade
     public function getId()
     {

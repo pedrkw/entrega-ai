@@ -2,24 +2,18 @@
       
       
       <div class="container">
-         <div class="col-lg-12">
-            <div class="p-3 mb-4 mt-4">
-               <div class="d-sm-flex align-items-center justify-content-between">
-                  <h1 class="h3 mb-4 text-gray-800">Oi, <?= $_SESSION['first_name']; ?>! 😊</h1>
-               </div>
-            </div>
-         </div>
          <div class="view-account">
             <section class="module">
                <div class="module-inner">
                   <?php include_once __DIR__ . '/../includes/sideMenu.php'; ?>
                   <div class="content-panel">
-                     <h2 class="title">Mudar senha</h2>
+                     <h2 class="title"><i class="fa fa-key"></i> Mudar senha</h2>
                      <div class="mb-4 mt-4">
                         <?= SessionMessage(); ?>
+                        <div class="resp"></div>
                      </div>
                      <div class="billing">
-                        <form action="<?= BASE_URL ?>usuario/senha/update" method="post">
+                        <form action="<?= BASE_URL ?>usuario/senha/update" name="formPassword" method="post">
                            <div class="form-group">
                               <label class="control-label" for="oldPassword">Senha atual:</label>
                               <input type="password" class="styles__Field-tg3uj4-1 gXNzQk" name="oldPassword" id="oldPassword" placeholder="Senha atual" required>
@@ -35,7 +29,7 @@
                               </div>
                            </div>
                            <input type="hidden" name="user_id" name="user_id" value="<?= $_SESSION['user_id'] ?>">
-                           <button type="submit" class="btn site-btn"><i class="fa fa-save"></i>  Atualizar</button>
+                           <button type="submit" onclick="return validated()" class="btn site-btn"><i class="fa fa-save"></i>  Atualizar</button>
                         </form>
                      </div>
                   </div>
@@ -44,61 +38,45 @@
          </div>
       </div>
 
-      <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
       <script type="text/javascript">
+         function validated(){
          
-         $(document).ready(function() {
-          
-            $('#user-form-edit').submit(function(event) {
+               var oldPassword = formPassword.oldPassword.value;
+               var password = formPassword.password.value;
+               var repeatPassword = formPassword.repeatPassword.value;
                
-               event.preventDefault();
-
-               // Check if any required fields are empty
-               var name = $('#name').val().trim();
-               var phone = $('#phone').val().trim();
-               var email = $('#email').val().trim();
-               var birthdate = $('#birthdate').val().trim();
-
-               if (name === '' || phone === '' || birthdate === '') {
-                  Swal.fire({
-                     icon: 'error',
-                     title: 'Erro!',
-                     text: 'Preencha todos os campos obrigatórios.',
-                  });
-                  return;
+               if(oldPassword == ""){
+                    $('.resp').html('<div class="alert alert-warning"><p> <strong>Ops!</strong> Preencha o campo Senha antiga.</p></div>')
+                    formPassword.oldPassword.focus();
+                    return false;
+               }else{
+                     $('.resp').html('');
                }
 
-               var formData = $(this).serialize();
-
-               $.ajax({
-                  type: 'POST',
-                  url: '<?= BASE_URL ?>usuario/update',
-                  data: formData,
-                  
-                  success: function(response) {
+               if(password == "" || password.length <= 5){
+                    $('.resp').html('<div class="alert alert-warning"><p> <strong>Ops!</strong> Preencha o campo senha com minimo 6 caracteres.</p></div>')
+                    formPassword.password.focus();
+                    return false;
+               }else{
+                     $('.resp').html('');
+               }
                
-                     if (response.success) {
-                        Swal.fire({
-                           icon: 'success',
-                           title: 'Sucesso!',
-                           text: 'Os seus dados foram atualizados!',
-                        });
-                     } else {
-                        Swal.fire({
-                           icon: 'error',
-                           title: 'Erro!',
-                           text: 'Não foi possível atualizar seus dados. Tente novamente!',
-                        });
-                     }
-
-                  },
-
-               });
-            
-            });
-         
-         });
+               if(repeatPassword == "" || repeatPassword.length <= 5){
+                    $('.resp').html('<div class="alert alert-warning"><p> <strong>Ops!</strong> Preencha o campo confirmar senha com minimo 6 caracteres.</p></div>')
+                    formPassword.repeatPassword.focus();
+                    return false;
+               }else{
+                     $('.resp').html('');
+               }
+               
+               if (password != repeatPassword) {
+                    $('.resp').html('<div class="alert alert-warning"><p> <strong>Ops!</strong> Senhas diferentes.</p></div>')
+                    formPassword.password.focus();
+                    return false;
+               }else{
+                     $('.resp').html('');
+               }
+         }
 
       </script>
 

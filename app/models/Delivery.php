@@ -19,6 +19,7 @@ class Delivery
     private ?string $recipient_address_details = null;
     private ?string $recipient_house_number = null;
     private ?int $vehicle_type_id  = null;
+    private ?int $vehicle_id  = null;
     private ?string $weight  = null;
     private ?int $delivery_status_id = null;
     private ?string $total_km  = null;
@@ -47,6 +48,31 @@ class Delivery
     private ?string $delivery_icon = null;
     private ?string $delivery_css_class = null;
 
+    private ?string $vehicle_brand = null;
+    private ?string $vehicle_model = null;
+    private ?string $vehicle_plate_number = null;
+    private ?string $vehicle_color = null;
+
+    public function getVehicle_brand()
+    {
+        return $this->vehicle_brand;
+    }
+
+    public function getVehicle_model()
+    {
+        return $this->vehicle_model;
+    }
+
+    public function getVehicle_plate_number()
+    {
+        return $this->vehicle_plate_number;
+    }
+
+    public function getVehicle_color()
+    {
+        return $this->vehicle_color;
+    }
+
     public function toArrayGet()
     {
         $data = [
@@ -66,6 +92,7 @@ class Delivery
         'recipient_address_details' => $this->getRecipient_address_details(),
         'recipient_house_number' => $this->getRecipient_house_number(),
         'vehicle_type_id' => $this->getVehicle_type_id(),
+        'vehicle_id' => $this->getVehicle_id(),
         'delivery_status_id' => $this->getDelivery_status_id(),
         'weight' => $this->getWeight(),
         'total_km' => $this->getTotal_km(),
@@ -232,6 +259,16 @@ class Delivery
     public function setVehicle_type_id($vehicle_type_id)
     {
         $this->vehicle_type_id = $vehicle_type_id;
+    }
+
+    public function getVehicle_id()
+    {
+        return $this->vehicle_id;
+    }
+
+    public function setVehicle_id($vehicle_id)
+    {
+        $this->vehicle_id = $vehicle_id;
     }
 
     public function getDelivery_status_id()

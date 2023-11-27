@@ -84,6 +84,16 @@
                                                             </option>
                                                         <?php } ?>
                                                     </select>
+                                                    <label for="payments_type">Selecione o tipo de pagamento:</label>
+                                                    <select id="payments_type" name="payments_type" class="form-select col-md-12">
+                                                        <option value="">Selecione</option>
+                                                        <option value="4">Pagar com pix</option>
+                                                        <?php foreach($cards as $card){ ?>
+                                                            <option value="<?= $card->getId() ?>">
+                                                                <?= substr($card->getCard_number(), 0, strrpos($card->getCard_number(), '.' ) - 9 ).'**** ****'; ?>
+                                                            </option>
+                                                        <?php } ?>
+                                                    </select>
                                                 </div>
                                                 <p>Detalhes: <input class="form-control" type="text" name="delivery_details" id="delivery_details"></p>
                                                 <button class="site-btn" onclick="calculateCost()">
@@ -107,6 +117,41 @@
                                                 <button type="submit" class="site-btn site-btn-secondary" id="solicitarButton">
                                                     <i class="fa fa-save"></i> Solicitar
                                                 </button>
+
+                                                <div class="modal fade" id="pagPix" tabindex="-1" width="100%" role="dialog" aria-hidden="true">
+                                                   <div class="modal-dialog" role="document">
+                                                      <div class="modal-content">
+                                                         <div class="modal-header">
+                                                            <h5 class="modal-title"><i class="fa fa-money" aria-hidden="true"></i> Pagar por pix</h5>
+                                                            <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">×</span>
+                                                            </button>
+                                                         </div>
+                                                         <div class="modal-body text-center">
+                                                            <div class="image-coupled">
+                                                               <img src="<?= IMG ?>/qrcode.png" class="img-fluid img-responsive" style="width: 60%;">
+                                                               <h4 class="text-muted mb-2 text-center" id="cnpj" value="81.152.094/0001-16">81.152.094/0001-16</h4>
+                                                               <button class="btn btn-primary btn-sm" id="copiarCNPJ"><i class="fa fa-clone" aria-hidden="true"></i> Copiar CNPJ</button>
+                                                            </div>
+                                                            <hr>
+                                                            <div class="row mt-3">
+                                                               <div class="col">
+                                                                  <p class="text-muted mb-2">O status do seu pedido será atualizado assim que a equipe verificar o pagamento. Após efetuar o pagamento, clique em "Finalizar compra" para concluir sua compra.</p>
+                                                               </div>
+                                                            </div>
+                                                            <hr>
+                                                            <div class="align-items-center text-center">
+                                                               <button type="submit" class="btn btn-success btn-icon-split" name="finalizar" id="finalizar">
+                                                                  <span class="icon text-white-50">
+                                                                     <i class="fas fa-check"></i>
+                                                                  </span>
+                                                                  <span class="text">Solicitar</span>
+                                                               </button>
+                                                            </div>
+                                                         </div>
+                                                      </div>
+                                                   </div>
+                                                </div>
                                             </form>
                                         </div>
                                     </div>
@@ -388,6 +433,32 @@
                    });
                 }
 
+</script>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+
+<script>
+
+   $(document).ready(function() {
+      $('#payments_type').change(function() {
+         if ($(this).val() == '4') {
+            $('#pagPix').modal('show');
+         }
+
+         $('#copiarCNPJ').click(function(){
+             $('#cnpj').select();
+               event.preventDefault();
+               var ok = document.execCommand('copy');
+               if (ok) { alert('CNPJ copiado para a área de transferência'); }
+         });
+
+      });
+
+
+   });
+   
 </script>
 
 <?php include_once __DIR__ . '/../includes/footer.php'; ?>

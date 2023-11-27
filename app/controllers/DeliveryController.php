@@ -8,6 +8,8 @@ use App\Models\Delivery;
 use App\Models\DAO\DeliveryDAO;
 use App\Models\VehicleType;
 use App\Models\DAO\VehicleTypeDAO;
+use App\Models\Vehicle;
+use App\Models\DAO\VehicleDAO;
 use App\Functions\Database;
 use App\Functions\View;
 use App\Functions\Message;
@@ -17,6 +19,7 @@ use App\Functions\Helpers;
 class DeliveryController
 {   
 
+    //Histórico Cliente
     public function renderHistoric()
     {
         // Verificar se o usuário já está autenticado
@@ -45,123 +48,6 @@ class DeliveryController
         ];
 
         View::render('users/historic', $data, 'default');
-    }
-
-    public function renderAvailableDeliveries()
-    {
-        // Verificar se o usuário já está autenticado
-        if (isset($_SESSION['user_id'])) 
-        {
-            Helpers::redirect('usuario/dashboard');
-        }
-
-        $driver_id = (int) $_SESSION['driver_id'];
-
-        $deliveryDAO = new DeliveryDAO();
-
-        $availableDeliveries = $deliveryDAO->getAvailableDeliveries("delivery_status_id = 1 ORDER BY total_price DESC");
-
-        $title = "Meu histórico | Entrega aí";
-        $data = [
-            'title' => $title,
-            'availableDeliveries' => $availableDeliveries,
-            'menuDinamic' => '/historico'
-        ];
-
-        View::render('drivers/availableDeliveries', $data, 'default');
-    }
-
-    public function acceptDelivery()
-    {
-        
-        if (!isset($_SESSION['driver_id'])) {
-            Helpers::redirect('motorista/login');
-        }
-
-        $driver_id = (int) $_SESSION['driver_id'];
-
-        $delivery_id = isset($_POST['delivery_id']) ? $_POST['delivery_id'] : null;
-        
-        if ($delivery_id !== null) {
-         
-            $delivery = new Delivery();
-            $delivery->setDriver_id($driver_id);
-            $delivery->setDelivery_status_id(2);
-
-            $deliveryDAO = new DeliveryDAO();
-            $data = $delivery->toArrayGet();
-
-            // Atualizar a entrega
-            $updatedDelivery = $deliveryDAO->updateDelivery($data, $delivery_id);
-
-            if ($updatedDelivery) {
-                echo "Algo deu errado na atualização da entrega";
-            } else {
-                echo "Deu certo";
-            }
-        } else {
-            echo "ID da entrega não está definido ou é inválido";
-        }
-    }
-
-    public function trackingDelivery()
-    {
-
-        // Verificar se o usuário já está autenticado
-        if (!isset($_SESSION['user_id'])) 
-        {
-            Helpers::redirect('usuario/login');
-        }
-
-        // Verificar se o motorista já está autenticado
-        if (isset($_SESSION['driver_id'])) 
-        {
-            Helpers::redirect('motorista/dashboard');
-        }
-
-        $title = "Rastrear encomenda | Entrega aí";
-        $data = [
-            'title' => $title,
-            'menuDinamic' => '/rastrear'
-        ];
-
-        View::render('users/tracking', $data, 'default');
-    }
-
-    public function trackingDeliveryId($delivery_id)
-    {
-
-        // Verificar se o usuário já está autenticado
-        if (!isset($_SESSION['user_id'])) 
-        {
-            Helpers::redirect('usuario/login');
-        }
-
-        // Verificar se o motorista já está autenticado
-        if (isset($_SESSION['driver_id'])) 
-        {
-            Helpers::redirect('motorista/dashboard');
-        }
-
-        if(!isset($delivery_id)){
-            Helpers::redirect('usuario/historico');   
-        }
-
-        $user_id = (int) $_SESSION['user_id'];
-
-        $deliveryDAO = new DeliveryDAO();
-
-        $delivery = $deliveryDAO->getByDeliveryId($delivery_id);
-
-        $title = "Rastrear encomenda #". $delivery_id ." | Entrega aí";
-        $data = [
-            'title' => $title,
-            'delivery' => $delivery,
-            'delivery_id' => $delivery_id,
-            'menuDinamic' => '/rastrear'
-        ];
-
-        View::render('users/tracking', $data, 'default');
     }
 
     // Cadastro de novo pedido
@@ -204,7 +90,7 @@ class DeliveryController
 
         $deliveryDAO = new DeliveryDAO();
 
-        $insertedDeliveryId = $deliveryDAO->insert($delivery->toArrayGet());
+        $insertedDeliveryId = $deliveryDAO->insert($delivery);
 
         if ($insertedDeliveryId > 0) {
             $_SESSION['msg'] = Message::success("Serviço solicitado! Em breve um motorista parceiro irá buscar sua encomenda!");
@@ -218,4 +104,295 @@ class DeliveryController
         }
     }
 
+    //Cancelar entrega
+    public function cancelDelivery()
+    {   
+        
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            Helpers::redirect('usuario/historico');
+        }
+
+        $id = isset($_POST['id']) ? (int)$_POST['id'] : null;
+        $user_id = isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : null;
+
+        $delivery = new Delivery();
+        $delivery->setDelivery_status_id(12);
+
+        $deliveryDAO = new deliveryDAO();
+
+        // Verifica se o delivery pertence ao usuario
+        $isUserdelivery = $deliveryDAO->getByConditions("user_id = $user_id AND id = $id");
+
+        if($isUserdelivery){
+
+            $updateddelivery = $deliveryDAO->update($delivery, "id = {$id}");
+
+            if ($updateddelivery) {
+                $_SESSION['msg'] = Message::success("Entrega cancelada com sucesso!");
+                Helpers::redirect('usuario/historico');
+            } else {
+                $_SESSION['msg'] = Message::error("Erro ao cancelar a entrega. Tente novamente!");
+                Helpers::redirect('usuario/historico');
+            }
+
+        } else {
+            $_SESSION['msg'] = Message::error("Erro ao cancelar a entrega. Tente novamente!");
+            Helpers::redirect('usuario/historico');
+        }
+    
+    }
+
+    // Página de pesquisa das entregas
+    public function trackingDelivery()
+    {
+
+        // Verificar se o usuário já está autenticado
+        if (!isset($_SESSION['user_id'])) 
+        {
+            Helpers::redirect('usuario/login');
+        }
+
+        // Verificar se o motorista já está autenticado
+        if (isset($_SESSION['driver_id'])) 
+        {
+            Helpers::redirect('motorista/dashboard');
+        }
+
+        $title = "Rastrear encomenda | Entrega aí";
+        $data = [
+            'title' => $title,
+            'menuDinamic' => '/rastrear'
+        ];
+
+        View::render('users/tracking', $data, 'default');
+    }
+
+    //Página de detalhes da entrega
+    public function trackingDeliveryId($delivery_id)
+    {
+
+        // Verificar se o usuário já está autenticado
+        if (!isset($_SESSION['user_id'])) 
+        {
+            Helpers::redirect('usuario/login');
+        }
+
+        // Verificar se o motorista já está autenticado
+        if (isset($_SESSION['driver_id'])) 
+        {
+            Helpers::redirect('motorista/dashboard');
+        }
+
+        if(!isset($delivery_id)){
+            Helpers::redirect('usuario/historico');   
+        }
+
+        $user_id = (int) $_SESSION['user_id'];
+
+        $deliveryDAO = new DeliveryDAO();
+
+        $delivery = $deliveryDAO->getDeliveryId($delivery_id);
+
+        $title = "Rastrear encomenda #". $delivery_id ." | Entrega aí";
+        $data = [
+            'title' => $title,
+            'delivery' => $delivery,
+            'delivery_id' => $delivery_id,
+            'menuDinamic' => '/rastrear'
+        ];
+
+        View::render('users/tracking', $data, 'default');
+    }
+
+
+    /*---------------------
+      Funções do motorista
+    -----------------------*/
+
+
+    //Histórico do motorista
+    public function renderHistoricDriver()
+    {
+        // Verificar se o motorista já está autenticado
+        if (!isset($_SESSION['driver_id'])) 
+        {
+            Helpers::redirect('motorista/login');
+        }
+
+        // Verificar se o usuario já está autenticado
+        if (isset($_SESSION['user_id'])) 
+        {
+            Helpers::redirect('usuario/dashboard');
+        }
+
+        $driver_id = (int) $_SESSION['driver_id'];
+
+        $deliveryDAO = new DeliveryDAO();
+
+        $deliveries = $deliveryDAO->getDeliveriesDriver($driver_id);
+
+        $title = "Meu histórico | Entrega aí";
+        $data = [
+            'title' => $title,
+            'deliveries' => $deliveries,
+            'menuDinamic' => '/historico'
+        ];
+
+        View::render('drivers/historic', $data, 'default');
+    }
+
+
+    //Serviços disponíveis motorista
+    public function renderAvailableDeliveries()
+    {
+        // Verificar se o usuário já está autenticado
+        if (isset($_SESSION['user_id'])) 
+        {
+            Helpers::redirect('usuario/dashboard');
+        }
+
+        $driver_id = (int) $_SESSION['driver_id'];
+
+        $deliveryDAO = new DeliveryDAO();
+        $vehicle = new Vehicle();
+        $vehicleDAO = new VehicleDAO();
+
+        $availableDeliveries = $deliveryDAO->getAvailableDeliveries("delivery_status_id = 1 ORDER BY total_price DESC");
+        $vehicles = $vehicleDAO->getByConditions("driver_id = $driver_id");
+
+        $title = "Meu histórico | Entrega aí";
+        $data = [
+            'title' => $title,
+            'availableDeliveries' => $availableDeliveries,
+            'vehicles' => $vehicles,
+            'menuDinamic' => '/servicos'
+        ];
+
+        View::render('drivers/availableDeliveries', $data, 'default');
+    }
+
+    // Página de rota do motorista
+    public function renderDelivering($delivery_id)
+    {
+        // Verificar se o usuário já está autenticado
+        if (isset($_SESSION['user_id'])) 
+        {
+            Helpers::redirect('usuario/dashboard');
+        }
+
+        $driver_id = (int) $_SESSION['driver_id'];
+
+        $deliveryDAO = new DeliveryDAO();
+
+        $delivery = $deliveryDAO->getByDeliveryId($delivery_id);
+
+        $title = "Meu histórico | Entrega aí";
+        $data = [
+            'title' => $title,
+            'delivery' => $delivery,
+            'delivery_id' => $delivery_id,
+            'menuDinamic' => '/historico'
+        ];
+
+        View::render('drivers/delivering', $data, 'default');
+    }
+
+    // Aceita o pedido do delivery
+    public function acceptDelivery()
+    {
+        if (!isset($_SESSION['driver_id'])) {
+            Helpers::redirect('motorista/login');
+        }
+
+        $driver_id = (int) $_SESSION['driver_id'];
+        $delivery_id = isset($_POST['delivery_id']) ? $_POST['delivery_id'] : null;
+        
+        if ($delivery_id !== null) {
+            $delivery = new Delivery();
+            $delivery->setDriver_id($driver_id);
+            $delivery->setVehicle_id($_POST['vehicle_id']);
+            $delivery->setDelivery_status_id(2);
+
+            $deliveryDAO = new DeliveryDAO();
+            $data = $delivery->toArrayGet();
+
+            // Atualizar a entrega
+            $updatedDelivery = $deliveryDAO->updateDelivery($data, $delivery_id);
+
+            if ($updatedDelivery) {
+                $_SESSION['msg'] = Message::error("Erro");
+                Helpers::redirect("motorista/servicos");
+            } else {
+                $_SESSION['msg'] = Message::success("Você agora está entregando a encomenda: #{$delivery_id}");
+                $redirectUrl = BASE_URL . 'motorista/delivering/' . urlencode($delivery_id);
+                header("Location: $redirectUrl");
+                exit();
+
+            }
+        } else {
+            echo "ID da entrega não está definido ou é inválido";
+        }
+    }
+
+    //Cancelar entrega
+    public function cancelDeliveryDriver()
+    {   
+        
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            Helpers::redirect('motorista/historico');
+        }
+
+        $id = isset($_POST['id']) ? (int)$_POST['id'] : null;
+        $driver_id = isset($_SESSION['driver_id']) ? (int)$_SESSION['driver_id'] : null;
+
+        $delivery = new Delivery();
+        $delivery->setDriver_id(NULL);
+        $delivery->setDelivery_status_id(6);
+
+        $deliveryDAO = new deliveryDAO();
+
+        // Verifica se o delivery pertence ao usuario
+        $isDriverdelivery = $deliveryDAO->getByConditions("driver_id = $driver_id AND delivery_id = $id");
+
+        if($isDriverdelivery){
+
+            $updateddelivery = $deliveryDAO->update($delivery, "id = {$id}");
+
+            if ($updateddelivery) {
+                $_SESSION['msg'] = Message::success("Entrega cancelada com sucesso!");
+                Helpers::redirect('motorista/historico');
+            } else {
+                $_SESSION['msg'] = Message::error("Erro ao cancelar a entrega. Tente novamente!");
+                Helpers::redirect('motorista/historico');
+            }
+
+        } else {
+            $_SESSION['msg'] = Message::error("Erro ao cancelar a entregas. Tente novamente!");
+            Helpers::redirect('motorista/historico');
+        }
+    
+    }
+
+
+    // Atualiza as coordenadas atuais do motorista no banco
+    public function updateCoordenades()
+    {
+        
+        $latitude = $_POST['latitude'];
+        $longitude = $_POST['longitude'];
+        $delivery_id = $_POST['delivery_id'];   
+
+        $deliveryDAO = new DeliveryDAO();
+
+        // Atualizar a entrega
+        $updatedDelivery = $deliveryDAO->updateCoordenades($latitude, $longitude, $delivery_id);
+
+        $response = [
+            'success' => $updatedDelivery
+        ];
+
+        header('Content-Type: application/json');
+        echo json_encode($response);
+    }
+    
 }

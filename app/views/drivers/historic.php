@@ -9,25 +9,25 @@
                         <div class="col-lg-12">
                            <div class="p-3 mb-4 ">
                               <div class="d-sm-flex align-items-center justify-content-between">
-                                 <h1 class="h3 mb-4 text-gray-800"><i class="fa fa-list-ul"></i> Entregas disponíveis</h1>
+                                 <h1 class="h3 mb-4 text-gray-800"><i class="fa fa-list-ul"></i> Histórico</h1>
                               </div>    
                               <div class="mb-4 mt-4">
                                  <?= SessionMessage(); ?>
                               </div>
                               <div class="text-center">
                                  <?php 
-                                 if(empty($availableDeliveries)){ ?>
+                                 if(empty($deliveries)){ ?>
                                 
                                  <div class="text-center">
                                     <img src="<?= IMG ?>/no_data.svg" style="width: 15%;" class="img-fluid ">
-                                    <p class="mt-4 mb-4">Ainda não encontramos nenhum serviço! Tenta mais tarde...</p>
+                                    <p class="mt-4 mb-4">Você ainda não solicitou nenhum serviço!</p>
                                  </div>
                                  
                                  <?php 
 
                                  }else{
 
-                                 foreach($availableDeliveries as $delivery){ ?>
+                                 foreach($deliveries as $delivery){ ?>
 
                                     <div class="delivery-area col-md-12">
                                         <a href="#" data-toggle="modal" data-target="#<?= $delivery->getDelivery_id() ?>" class="text-decoration-none text-dark">
@@ -81,17 +81,13 @@
                                                                 <p class="btn <?= $delivery->getDelivery_Css_Class(); ?> py-1 px-2 mb-0 text-white">
                                                                     <i class="<?= $delivery->getDelivery_Icon(); ?>" aria-hidden="true"></i> <?= $delivery->getDelivery_Status_Name(); ?>
                                                                 </p>
+                                                                <p class="text-muted mb-0"><?= $delivery->getDelivery_Status_Description(); ?></p>
                                                             </div>
                                                             <div class="col-md-12 mb-4">
-                                                                <h5>Onde o pedido está:</h5>
                                                                 <div id="map" style="width: 100%; height: 250px;"></div>
                                                             </div>
                                                             <div class="col-md-12 mb-4">
-                                                                <h5>Pedido feito por:</h5>
-                                                                <p class="text-muted"><?= $delivery->getUser_name() ?></p>
-                                                            </div>
-                                                            <div class="col-md-12 mb-4">
-                                                                <h5>Observações</h5>
+                                                                <h5>Suas Observações</h5>
                                                                 <p class="text-muted"><?= ($delivery->getDelivery_details() == '') ? "Não há observações." : $delivery->getDelivery_details(); ?></p>
                                                             </div>
                                                             <div class="col-md-6 mb-4">
@@ -118,6 +114,10 @@
                                                                 <h5>Forma de Pagamento</h5>
                                                                 <p class="text-muted">Cartão de Crédito</p>
                                                             </div>
+                                                            <div class="col-md-6 mb-3">
+                                                                <h5>Nome do Motorista</h5>
+                                                                <p class="text-muted"><?= (empty($delivery->getDriver_name())) ? "Nenhum motorista aceitou seu pedido" : $delivery->getDriver_name(); ?></p>
+                                                            </div>
                                                             <?php if ($delivery->getDelivery_status_id() === 5) { ?>
                                                                 <div class="col-md-6 mb-3">
                                                                     <h5><i class="fa fa-truck" aria-hidden="true"></i> Entregue em:</h5>
@@ -125,29 +125,19 @@
                                                                 </div>
                                                             <?php } ?>
                                                             <div class="col-md-12">
-                                                                <h4 class="text-center mb-4">Total: R$ <?= number_format($delivery->getTotal_price(), 2, ',', '.'); ?>
-                                                                    
-                                                                </h4>
+                                                                <h4 class="text-center mb-4">Total: R$ <?= number_format($delivery->getTotal_price(), 2, ',', '.'); ?></h4>
+                                                                <p class="text-muted text-center">Obrigado por escolher nossos serviços! Esperamos vê-lo novamente em breve! <i class="fa fa-laugh-wink"></i></p>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <form action="<?= BASE_URL ?>motorista/acceptDelivery" onsubmit="return confirm('Você tem certeza que quer aceitar essa encomenda?')" method="post">
-                                                    <select class="form-control" required name="vehicle_id" id="vehicle_id">
-                                                        <option value="">Selecione</option>
-                                                        <?php foreach($vehicles as $vehicle){ ?>
-                                                            <option value="<?= $vehicle->getId(); ?>"><?= $vehicle->getBrand() ?> <?= $vehicle->getModel() ?>, <?= $vehicle->getPlate_number() ?></option>
-                                                        <?php } ?>
-                                                    </select>
-                                                        <input type="hidden" name="delivery_id" id="delivery_id" value="<?= $delivery->getDelivery_id(); ?>">
-                                                        <button class="btn btn-primary" target="_blank">
-                                                        <i class="fa fa-check-circle"></i> Aceitar Encomenda?
-                                                        </button>
-                                                    </form>
                                                 <div class="modal-footer text-center justify-content-center">
                                                     <button type="button" class="btn btn-danger" data-dismiss="modal">
                                                         <i class="fa fa-times"></i> Fechar
                                                     </button>
+                                                    <a href="<?= BASE_URL ?>usuario/rastrear/delivery/<?= $delivery->getDelivery_id(); ?>" class="btn btn-primary" target="_blank">
+                                                        <i class="fa fa-search"></i> Rastrear Encomenda
+                                                    </a>
                                                 </div>
                                             </div>
                                         </div>
@@ -178,13 +168,10 @@
 
             map = new google.maps.Map(document.getElementById('map'), {
                 center: {
-                <?php 
-                foreach ($availableDeliveries as $delivery) { ?>
-                    lat: <?= $delivery->getSender_latitude(); ?>,
-                    lng: <?= $delivery->getSender_longitude(); ?>
-                <?php } ?>
+                    lat: -4.9690932199055835,
+                    lng: -39.016540651386585
                 },
-                zoom: 20,
+                zoom: 15,
                 mapTypeId: 'roadmap'
             });
         }

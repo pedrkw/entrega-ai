@@ -2,13 +2,6 @@
       
       
       <div class="container">
-         <div class="col-lg-12">
-            <div class="p-3 mb-4 mt-4">
-               <div class="d-sm-flex align-items-center justify-content-between">
-                  <h1 class="h3 mb-4 text-gray-800">Oi, <?= $_SESSION['first_name']; ?>! 😊</h1>
-               </div>
-            </div>
-         </div>
          <div class="view-account">
             <section class="module">
                <div class="module-inner">

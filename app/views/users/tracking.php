@@ -63,10 +63,75 @@
                                     <p class="h5 mt-4 text-gray-800">Acompanhe onde está sua encomenda</p>
                                     
                                     <div class="row justify-content-center mt-4">
-                                        <div class="col-lg-8">
+                                        <div class="col-lg-12">
                                             <div class="card">
                                                 <div class="card-body">
                                                     <div id="map" style="height: 400px;"></div>
+                                                    <?php foreach($delivery as $deliveries){ ?>
+                                                        <div class="container-fluid mt-4">
+                                                        <div class="row">
+                                                            <div class="col-md-12 mb-4">
+                                                                <p class="text-muted"><i class="far fa-clock"></i> Data da entrega: <?= date('d/m/Y, H:i', strtotime($deliveries->getCreated_at())); ?></p>
+                                                            </div>
+                                                            <div class="col-md-12 mb-4">
+                                                                <h5>Status do Pedido</h5>
+                                                                <p class="btn <?= $deliveries->getDelivery_Css_Class(); ?> py-1 px-2 mb-0 text-white">
+                                                                    <i class="fa <?= $deliveries->getDelivery_Icon(); ?>" aria-hidden="true"></i> <?= $deliveries->getDelivery_Status_Name(); ?>
+                                                                </p>
+                                                            </div>
+                                                            <div class="col-md-12 mb-4">
+                                                                <p class="text-muted mb-0"><?= $deliveries->getDelivery_Status_Description(); ?></p>
+                                                            </div>
+                                                            <div class="col-md-12 mb-4">
+                                                                <h5>Suas Observações</h5>
+                                                                <p class="text-muted"><?= ($deliveries->getDelivery_details() == '') ? "Não há observações." : $deliveries->getDelivery_details(); ?></p>
+                                                            </div>
+                                                            <div class="col-md-6 mb-4">
+                                                                <h5>Local de Retirada</h5>
+                                                                <p class="text-muted"><?= $deliveries->getSender_address_details() . ", N " . $deliveries->getSender_house_number(); ?></p>
+                                                            </div>
+                                                            <div class="col-md-6 mb-3">
+                                                                <h5>Local de Entrega</h5>
+                                                                <p class="text-muted"><?= $deliveries->getRecipient_address_details() . ", N " . $deliveries->getRecipient_house_number(); ?></p>
+                                                            </div>
+                                                            <div class="col-md-6 mb-3">
+                                                                <h5>Tipo de Veículo</h5>
+                                                                <p class="text-muted"><?= $deliveries->getVehicle_type_name() . " | R$ " . number_format($deliveries->getVehicle_base_rate(), 2, ',', '.') . " | R$ " . number_format($deliveries->getVehicle_rate_per_km(), 2, ',', '.') . " / Km"; ?></p>
+                                                            </div>
+                                                            <div class="col-md-6 mb-3">
+                                                                <h5>Peso Total</h5>
+                                                                <p class="text-muted"><?= $deliveries->getWeight(); ?> Kg</p>
+                                                            </div>
+                                                            <div class="col-md-6 mb-3">
+                                                                <h5>Distância</h5>
+                                                                <p class="text-muted"><?= $deliveries->getTotal_km(); ?> Km</p>
+                                                            </div>
+                                                            <div class="col-md-6 mb-3">
+                                                                <h5>Forma de Pagamento</h5>
+                                                                <p class="text-muted">Cartão de Crédito</p>
+                                                            </div>
+                                                            <div class="col-md-6 mb-3">
+                                                                <h5>Nome do Motorista</h5>
+                                                                <p class="text-muted"><?= (empty($deliveries->getDriver_name())) ? "Nenhum motorista aceitou seu pedido" : $deliveries->getDriver_name(); ?></p>
+                                                            </div>
+                                                           <div class="col-md-6 mb-3">
+                                                                <h5>Veículo:</h5>
+                                                                <?= $deliveries->getVehicle_brand() ?> <?= $deliveries->getVehicle_model() ?>, <?= $deliveries->getVehicle_plate_number() ?>
+                                                                <strong>Cor:</strong> <span class="badge text-white" style="background-color: <?= $deliveries->getVehicle_color(); ?>;">⠀</span>
+                                                            </div>
+                                                            <?php if ($deliveries->getDelivery_status_id() === 4) { ?>
+                                                                <div class="col-md-6 mb-3">
+                                                                    <h5><i class="fa fa-truck" aria-hidden="true"></i> Entregue em:</h5>
+                                                                    <p class="text-muted"><?= date('d/m/Y, H:i', strtotime($deliveries->getUpdated_at())); ?></p>
+                                                                </div>
+                                                            <?php } ?>
+                                                            <div class="col-md-12">
+                                                                <h4 class="text-center mb-4">Total: R$ <?= number_format($deliveries->getTotal_price(), 2, ',', '.'); ?></h4>
+                                                                <p class="text-muted text-center">Obrigado por escolher nossos serviços! Esperamos vê-lo novamente em breve! <i class="fa fa-laugh-wink"></i></p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <?php } ?>
                                                 </div>
                                             </div>
                                         </div>
@@ -107,7 +172,7 @@
             var directionsService = new google.maps.DirectionsService();
             var directionsRenderer = new google.maps.DirectionsRenderer();
             var map = new google.maps.Map(document.getElementById('map'), {
-                center: deliveryPoints[0], // Usando o primeiro ponto como ponto central inicial
+                center: deliveryPoints[0],
                 zoom: 12
             });
             directionsRenderer.setMap(map);
@@ -120,15 +185,15 @@
                 });
             }
 
-            var start = new google.maps.LatLng(deliveryPoints[0].lat, deliveryPoints[0].lng); // Coordenadas iniciais
-            var end = new google.maps.LatLng(deliveryPoints[deliveryPoints.length - 1].lat, deliveryPoints[deliveryPoints.length - 1].lng); // Coordenadas do último ponto
+            var start = new google.maps.LatLng(deliveryPoints[0].lat, deliveryPoints[0].lng);
+            var end = new google.maps.LatLng(deliveryPoints[deliveryPoints.length - 1].lat, deliveryPoints[deliveryPoints.length - 1].lng);
 
             var request = {
                 origin: start,
                 destination: end,
                 waypoints: waypoints,
                 optimizeWaypoints: true,
-                travelMode: google.maps.TravelMode.DRIVING // Pode ser WALKING, BICYCLING, ou outros
+                travelMode: google.maps.TravelMode.DRIVING
             };
 
             directionsService.route(request, function(result, status) {

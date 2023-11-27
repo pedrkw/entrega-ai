@@ -66,7 +66,7 @@ class UserController
         if (isset($_SESSION['driver_id'])) 
         {
             Helpers::redirect('motorista/dashboard');
-        }
+        } 
 
         $title = "Página inicial | Entrega aí";
         $data = [
@@ -169,7 +169,7 @@ class UserController
         }
 
         // Tenta inserir o usuário no banco de dados
-        $insertedUserId = $userDAO->insert($user->toArrayGet());
+        $insertedUserId = $userDAO->insert($user);
 
         if ($insertedUserId > 0) {
 
@@ -178,6 +178,7 @@ class UserController
             // Define as variáveis de sessão
             $_SESSION['user_id'] = $user->getId();
             $_SESSION['user_name'] = $user->getName();
+            $_SESSION['user_cpf'] = $user->getCpf();
             $_SESSION['user_email'] = $user->getEmail();
             $_SESSION['user_phone'] = $user->getPhone();
             $_SESSION['user_cpf'] = $user->getCpf();
@@ -265,21 +266,15 @@ class UserController
 
         $userDAO = new UserDAO();
 
-        $data = $user->toArrayGet();
-
         // Atualização do usuário
-        $userDAO->update($data, $userId);
-
-        // Verificação do sucesso da atualização
-        $updatedUser = $userDAO->getById($userId);
+        $updatedUser = $userDAO->update($user, "id = {$userId}");
 
         if ($updatedUser) {
             // Atualiza a sessão com os novos dados do usuário
-            $_SESSION['user_name'] = $updatedUser->getName();
-            $_SESSION['user_email'] = $updatedUser->getEmail();
-            $_SESSION['user_phone'] = $updatedUser->getPhone();
+            $_SESSION['user_name'] = $user->getName();
+            $_SESSION['user_phone'] = $user->getPhone();
             $_SESSION['user_cpf'] = $user->getCpf();
-            $_SESSION['user_birthdate'] = $updatedUser->getBirthdate();
+            $_SESSION['user_birthdate'] = $user->getBirthdate();
             $_SESSION['first_name'] = Helpers::getFirstName($_SESSION['user_name']);
 
             // Resposta em JSON para solicitações AJAX

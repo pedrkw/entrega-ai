@@ -3,6 +3,7 @@
 namespace App\Models\DAO;
 
 use App\Functions\GenericDAO;
+use App\Functions\Database;
 use App\Models\Delivery;
 use App\Models\VehicleType;
 
@@ -24,6 +25,46 @@ class DeliveryDAO extends GenericDAO
         $sql = "
         SELECT 
         deliveries.*, 
+        vehicles.id AS vehicle_id, 
+        vehicles.brand AS vehicle_brand, 
+        vehicles.model AS vehicle_model, 
+        vehicles.plate_number AS vehicle_plate_number, 
+        vehicles.color AS vehicle_color, 
+        vehicle_types.type_name AS vehicle_type_name, 
+        vehicle_types.base_rate AS vehicle_base_rate, 
+        vehicle_types.rate_per_km AS vehicle_rate_per_km,
+        drivers.name AS driver_name,
+        delivery_status.status_name AS delivery_status_name,
+        delivery_status.status_description AS delivery_status_description,
+        delivery_status.icon AS delivery_icon,
+        delivery_status.css_class AS delivery_css_class
+        FROM deliveries
+        JOIN vehicle_types ON deliveries.vehicle_type_id = vehicle_types.id
+        LEFT JOIN drivers ON deliveries.driver_id = drivers.id
+        LEFT JOIN delivery_status ON deliveries.delivery_status_id = delivery_status.id
+        LEFT JOIN vehicles ON deliveries.vehicle_id = vehicles.id
+        WHERE deliveries.user_id = :user_id
+        ORDER BY deliveries.created_at DESC;
+        ";
+
+        $params = [
+            'user_id' => $user_id,
+        ];
+
+        return $this->executeQuery($sql, $params);
+    }
+
+    // Pegar o todos os pedidos do usuário
+    public function getDeliveryId($delivery_id)
+    { 
+        $sql = "
+        SELECT 
+        deliveries.*,
+        vehicles.id AS vehicle_id, 
+        vehicles.brand AS vehicle_brand, 
+        vehicles.model AS vehicle_model, 
+        vehicles.plate_number AS vehicle_plate_number, 
+        vehicles.color AS vehicle_color,
         vehicle_types.id AS vehicle_type_id, 
         vehicle_types.type_name AS vehicle_type_name, 
         vehicle_types.base_rate AS vehicle_base_rate, 
@@ -37,16 +78,49 @@ class DeliveryDAO extends GenericDAO
         JOIN vehicle_types ON deliveries.vehicle_type_id = vehicle_types.id
         LEFT JOIN drivers ON deliveries.driver_id = drivers.id
         LEFT JOIN delivery_status ON deliveries.delivery_status_id = delivery_status.id
-        WHERE deliveries.user_id = :user_id
+        LEFT JOIN vehicles ON deliveries.vehicle_id = vehicles.id
+        WHERE deliveries.delivery_id = :delivery_id
         ORDER BY deliveries.created_at DESC;
         ";
 
         $params = [
-            'user_id' => $user_id,
+            'delivery_id' => $delivery_id,
         ];
 
         return $this->executeQuery($sql, $params);
     }
+
+
+    // Pegar o todos os pedidos do motorista
+    public function getDeliveriesDriver($driver_id)
+    { 
+        $sql = "
+        SELECT 
+        deliveries.*, 
+        vehicle_types.id AS vehicle_type_id, 
+        vehicle_types.type_name AS vehicle_type_name, 
+        vehicle_types.base_rate AS vehicle_base_rate, 
+        vehicle_types.rate_per_km AS vehicle_rate_per_km,
+        drivers.name AS driver_name,
+        delivery_status.status_name AS delivery_status_name,
+        delivery_status.status_description AS delivery_status_description,
+        delivery_status.icon AS delivery_icon,
+        delivery_status.css_class AS delivery_css_class
+        FROM deliveries
+        JOIN vehicle_types ON deliveries.vehicle_type_id = vehicle_types.id
+        LEFT JOIN drivers ON deliveries.driver_id = drivers.id
+        LEFT JOIN delivery_status ON deliveries.delivery_status_id = delivery_status.id
+        WHERE deliveries.driver_id = :driver_id
+        ORDER BY deliveries.created_at DESC;
+        ";
+
+        $params = [
+            'driver_id' => $driver_id,
+        ];
+
+        return $this->executeQuery($sql, $params);
+    }
+
 
     // Pegar o todos os pedidos disponíveis
     public function getAvailableDeliveries()
@@ -97,15 +171,65 @@ class DeliveryDAO extends GenericDAO
 
         $sql = "UPDATE deliveries SET $placeholders WHERE delivery_id = :delivery_id";
 
-        return $this->executeQuery($sql, $params);
+        $result = $this->executeQuery($sql, $params);
+        
+        if (!empty($result)) {
+            return reset($result);
+        } else {
+            return null;
+        }
 
     }
+
+    // Atualiza registro
+    public function updateCoordenades($latitude, $longitude, $delivery_id)
+    {
+
+        $db = Database::getConnection();
+
+        // Prepare a query
+        $sql = "UPDATE deliveries SET current_latitude = :latitude, current_longitude = :longitude WHERE delivery_id = :delivery_id";
+        $stmt = $db->prepare($sql);
+
+        // Bind dos parâmetros
+        $stmt->bindParam(':latitude', $latitude);
+        $stmt->bindParam(':longitude', $longitude);
+        $stmt->bindParam(':delivery_id', $delivery_id);
+
+        // Execute a query
+        $stmt->execute();
+
+        // Verificar se a query foi executada com sucesso
+        return $stmt->rowCount() > 0;
+    }
+
+
+    public function getCoordinates($delivery_id)
+    {   
+        $db = Database::getConnection();
+        
+        $sql = "SELECT current_latitude, current_longitude FROM deliveries WHERE delivery_id = :delivery_id";
+        $stmt = $db->prepare($sql);
+        $stmt->bindParam(':delivery_id', $delivery_id);
+        $stmt->execute();
+
+        // Retorna as coordenadas atualizadas como um array associativo
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+
+
 
     public function getTrackingDelivery($user_id, $delivery_id)
     {
         $sql = "
             SELECT 
                 deliveries.*, 
+                vehicles.id AS vehicle_id, 
+                vehicles.brand AS vehicle_brand, 
+                vehicles.model AS vehicle_model, 
+                vehicles.plate_number AS vehicle_plate_number, 
+                vehicles.color AS vehicle_color,
                 vehicle_types.id AS vehicle_type_id, 
                 vehicle_types.type_name AS vehicle_type_name, 
                 vehicle_types.base_rate AS vehicle_base_rate, 
@@ -119,6 +243,7 @@ class DeliveryDAO extends GenericDAO
             JOIN vehicle_types ON deliveries.vehicle_type_id = vehicle_types.id
             LEFT JOIN drivers ON deliveries.driver_id = drivers.id
             LEFT JOIN delivery_status ON deliveries.delivery_status_id = delivery_status.id
+            LEFT JOIN vehicles ON deliveries.vehicle_id = vehicles.id
             WHERE deliveries.user_id = :user_id AND deliveries.id = :delivery_id
             ORDER BY deliveries.created_at DESC;
         ";

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 25/11/2023 às 21:33
+-- Tempo de geração: 27/11/2023 às 12:38
 -- Versão do servidor: 10.4.20-MariaDB
 -- Versão do PHP: 8.0.9
 
@@ -125,6 +125,13 @@ CREATE TABLE `drivers` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Despejando dados para a tabela `drivers`
+--
+
+INSERT INTO `drivers` (`id`, `name`, `email`, `password`, `phone`, `cpf`, `licence`, `birthdate`, `validated`, `type_user`, `created_at`, `updated_at`) VALUES
+(22, 'concurseiro0096', 'concurso@gmail.com', '$2y$10$s6rh9hYKCBNHx8PHV2p1nOy8VB751oCEAeGhRmeTkKa6jr42Wrg22', '12312312312', 2147483647, 2147483647, '2001-02-25', 0, 1, '2023-11-25 21:01:16', '2023-11-25 21:01:16');
 
 -- --------------------------------------------------------
 
@@ -277,7 +284,7 @@ ALTER TABLE `adresses`
 -- AUTO_INCREMENT de tabela `deliveries`
 --
 ALTER TABLE `deliveries`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
 
 --
 -- AUTO_INCREMENT de tabela `delivery_status`
@@ -289,41 +296,31 @@ ALTER TABLE `delivery_status`
 -- AUTO_INCREMENT de tabela `drivers`
 --
 ALTER TABLE `drivers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT de tabela `payment_cards`
 --
 ALTER TABLE `payment_cards`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT de tabela `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=78;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=79;
 
 --
 -- AUTO_INCREMENT de tabela `vehicles`
 --
 ALTER TABLE `vehicles`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT de tabela `vehicle_types`
 --
 ALTER TABLE `vehicle_types`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
-
---
--- Restrições para tabelas despejadas
---
-
---
--- Restrições para tabelas `payment_cards`
---
-ALTER TABLE `payment_cards`
-  ADD CONSTRAINT `payment_cards_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
